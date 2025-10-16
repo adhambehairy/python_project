@@ -1,0 +1,101 @@
+class BankAccount:
+    def __init__(self,name,balance):
+        self.set_name(name)
+        self.set_balance(balance)
+        
+    def set_name(self,name):
+        if isinstance(name, str) and name.strip():
+            self.__name=name
+        else:
+            raise ValueError("الإسم غير صالح") 
+                   
+    def get_name(self):
+        return self.__name
+    
+    def set_balance(self,balance):
+        if balance>=0:
+            self.__balance=balance
+        
+        else:
+            raise ValueError('الرصيد لا يمكن ان يكون ساليا')   
+    
+    def get_balance(self):
+        return self.__balance
+    
+    def deposit(self,amount):
+        self.__balance+= amount
+        
+    def withdraw(self,amount):
+        if self.__balance>= amount:
+            self.__balance-=amount
+        else:
+            print('الرصيد غير كافي') 
+          
+    def display(self):
+        print(f"Name: {self.__name},Balance: {self.__balance}") 
+    
+    def __add__(self,other):
+        return self.get_balance()+other.get_balance()
+        
+class CurrentAccount(BankAccount):
+    def __init__(self,name,balance,overdraft_limit):
+        super().__init__(name,balance)
+        self.__overdraft_limit=overdraft_limit
+        
+    def withdraw(self,amount):
+        if amount <= self.get_balance() + self.__overdraft_limit:
+            new_balance=self.get_balance()-amount
+        else:
+            print("لقد تجاوزت الحد الإئتماني") 
+    
+    def display(self):
+         print(f"Name: {self.get_name()},Balance: {self.get_balance()} ,Credit limit:{self.get_balance() + self.__overdraft_limit}") 
+         
+             
+class PremiumCurrentAccount(CurrentAccount):
+    def __init__(self,name,balance,overdraft_limit,cashback_rate):
+        super().__init__(name,balance,overdraft_limit)
+        self.__cashback_rate=cashback_rate
+        
+    def deposit(self,amount):
+        cashback= amount * self.__cashback_rate
+        super().deposit(amount+cashback)    
+        
+class RewardsMixin:
+    def __init__(self):
+        self.points=0
+    
+    def earn_points(self,amount):
+        self.points+=int(amount // 10)   
+    
+    def show_points(self):
+        print(f"Number of points: {self.points}")         
+            
+class RewardedAccount(BankAccount,RewardsMixin):
+    def __init__(self,name,balance):
+         super().__init__(name,balance)
+         RewardsMixin.__init__(self)
+         
+    def deposit(self, amount):
+         super().deposit(amount)
+         self.earn_points(amount)  
+              
+    def display(self):
+        print(f"Name: {self.get_name()},Balance: {self.get_balance()}") 
+        self.show_points()     
+
+
+         
+acc1= BankAccount('Adham',1000)
+acc2= PremiumCurrentAccount("Nasser",2000,100,0.05)
+acc3= RewardedAccount("Hassan",850)    
+
+acc2.deposit(1000)
+acc3.deposit(200)
+
+acc1.display() 
+acc2.display()
+acc3.display()    
+
+print(acc1+acc2)        
+         
