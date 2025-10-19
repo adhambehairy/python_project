@@ -1,0 +1,132 @@
+class Vehicle:
+    def __init__(self,brand,vid,rental_rate):
+        if isinstance(brand,str):
+            self.brand=brand
+        else:
+            raise ValueError("Dieser Name ist nicht richtig")    
+        self.vid=vid
+        self.__rental_rate=rental_rate
+        self.__is_rented= False
+    
+    def get_rental_rate(self):
+        return self.__rental_rate
+    
+    def rent_status(self):
+        return self.__is_rented
+    
+    def calculate_cost(self,days):
+        return self.__rental_rate * int(days)
+    
+    def rent(self):
+        if not self.__is_rented:
+            self.__is_rented=True
+            print(f"{self.brand} (id: {self.vid}) wurde vermietet.") 
+        else:
+            print(f"{self.brand} (id: {self.vid}) ist bereits vermietet.") 
+    
+    def return_vehicle(self):
+        if self.__is_rented:
+            self.__is_rented=False
+            print(f"{self.brand} (id: {self.vid}) wurde zurückgegeben.") 
+        else:
+           print(f"{self.brand} (id: {self.vid}) ist nicht vermietet.") 
+    
+    def display_info(self):
+        status = "vermietet" if self.__is_rented else "verfügbar" 
+        print(f"ID: {self.vid} | brand: {self.brand}| Preis/Tag: {self.__rental_rate}$ | Status:{status}") 
+            
+            
+class Truck(Vehicle):
+    def calculate_cost(self,days):
+        return self.get_rental_rate() * int(days) 
+        
+
+    
+class Car(Vehicle):
+    def calculate_cost(self,days):
+        return self.get_rental_rate() * int(days) 
+
+class Bike(Vehicle):
+    def calculate_cost(self,days):
+        return self.get_rental_rate() * int(days) 
+
+class Customer:
+    def __init__(self,name,cid):
+        self.name=name
+        self.cid=cid
+        self.rented_vehicle=None
+        
+    def rent(self,vehicle):
+        if self.rented_vehicle is not None:
+            print(f"{self.name} hat bereits ein fahrzeug gemietet")  
+        
+        elif vehicle.rent_status():
+            print(f"{vehicle.brand} (id: {vehicle.vid}) ist bereits vermietet")
+        
+        else:
+            self.rented_vehicle=vehicle
+            vehicle.rent()
+            print(f"{self.name} hat {vehicle.brand} gemietet")
+    
+    def return_vehicle(self):
+        if self.rented_vehicle is not None:
+            self.rented_vehicle.return_vehicle()
+            print(f"{self.name} hat das fahrzeug zurückgegeben") 
+            self.rented_vehicle=None
+        else:
+            print(f"{self.name} hat kein fahrzeug gemeitet") 
+                               
+
+class RentalSystem:
+    def __init__(self):
+        self.vehicles={}
+        self.car_count=0
+        self.bike_count=0
+        self.truck_count=0
+        
+    def add_vehicle(self,vtype,brand,rental_rate):
+        if vtype.lower() =='car':
+            self.car_count+=1 
+            vid = f"C{self.car_count:03d}"
+            vehicle= Car(brand,vid,rental_rate)   
+        elif vtype.lower() =='bike':
+            self.bike_count+=1
+            vid = f"B{self.bike_count:03d}"
+            vehicle= Bike(brand,vid,rental_rate)
+        elif vtype.lower() =='truck':
+            self.truck_count+=1
+            vid=f"T{self.truck_count:03d}"
+            vehicle=Truck(brand,vid,rental_rate)
+        else:
+            print('Ungültiger Fahrzeugtyp')  
+            return
+        
+        self.vehicles[vid]=vehicle
+        print(f"{vtype.title()} '{brand}' hinzugefügt mit ID {vid}")
+    
+    def remove_vehicle(self,vid):
+        if vid in self.vehicles:
+            removed= self.vehicles.pop(vid)
+            print(f"{removed.brand} (ID: {vid}) wurde entfernt.")
+        else:
+            print("Fahrzeug mit dieser ID existiert nicht")
+            
+            
+        
+        
+if __name__=="__main__":
+    system = RentalSystem()
+    
+    system.add_vehicle("car","Toyota",60)
+    system.add_vehicle("car","BMW",70)
+    system.add_vehicle("truck","Volvo",200)
+    system.add_vehicle("bike","Yamaha",30)
+    
+    
+    customer1= Customer("Adham","C01")
+       
+    car1=system.vehicles["C002"]
+    customer1.rent(car1)
+    
+    for v in system.vehicles.values():
+        v.display_info()
