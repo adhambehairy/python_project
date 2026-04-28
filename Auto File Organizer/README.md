@@ -24,4 +24,10 @@ It sorts files into categories like Images, Videos, and Others based on file ext
 
 ---
 
-## 📂 Folder Structure (after running)
+## 🛠️ Technologies Used
+- Python 🐍  
+- os (file system handling)  
+- shutil (moving files)
+
+---
+
